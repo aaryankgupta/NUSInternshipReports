@@ -68,6 +68,6 @@ with open("dualgraph.gr", "w") as external_file:
     for c in range(numClause):
         for c2 in dual_graph[c]:
             if(c<c2):
-                print(str(c)+' '+str(c2), file=external_file)
+                print(str(c+1)+' '+str(c2+1), file=external_file)
 
     external_file.close()
