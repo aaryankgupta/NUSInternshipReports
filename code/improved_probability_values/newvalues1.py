@@ -43,8 +43,18 @@ rho=1.1
 #function which gives cominatorial term in summation for variance
 @memoize
 def computeterm(d, logsetsize, w):
+    if (logsetsize < d):
+        numexp = min(logsetsize / (math.log(d*1.0 / logsetsize, 2)), logsetsize/2)
+    else:
+        numexp = d
     if(w>0):
-        cterm= (w*w)*((4*math.e*math.sqrt(d*logsetsize)/w)**w)*(exp(logsetsize))
+        if w == 1:
+            return logsetsize
+        if w == 0:
+            return 1
+        if w == 2:
+            return 2*d*min(math.ceil(numexp),logsetsize)-logsetsize
+        cterm= (w/2)*((4*math.e*math.sqrt(d*logsetsize)/w)**w)*(exp(logsetsize))
     else:
         cterm=coomb(d, w)
     return cterm
@@ -62,6 +72,7 @@ def computeratio(d, m, p,pivotfactor):
             probcorr += reduce(op.add, (math.log(1 + p**w) for i in range(1, m)), 0)
         probcorr = exp(Decimal(probcorr)) - 1
         cterm = int(min(coomb(d, w), computeterm(d, n, w), (1 << n) - sumval))
+        # print('cterm '+str(cterm))
         sumval += cterm
         term = cterm * Decimal(probcorr)
         sum += Decimal(term)+1
@@ -99,7 +110,8 @@ for iteration in range(1,n+1):
         density = 0.0
         for j in range(prev_val, 1, -decr):
             m = 1-(j*2.0/(2*prev_max))
-            ratio = computeratio(iteration*100, i, m,pivotfactor)
+            ratio = computeratio(iteration*100, i, m, pivotfactor)
+            print('ratio '+str(ratio))
             if (ratio > rho or (j < decr)):
                 probval = (j+decr)*1.0/(2*prev_max)
                 if (probval > 0.5):
